@@ -76,6 +76,14 @@ class EnvSetupTest(unittest.TestCase):
             for step in found["steps"]:
                 self.assertNotIn(NIGHTLY, step, f"{env}: the index belongs in torch_index")
 
+    def test_the_marker_has_c2s_fields(self):
+        import hashlib
+        body = envsetup.marker_body("speech", "0.1.0", "litesound", "GPU sm_120 | torch x")
+        self.assertEqual(sorted(body), ["built_at", "env", "gpu", "package_version", "recipe_sha256", "verify"])
+        self.assertEqual((body["env"], body["package_version"], body["verify"]), ("speech", "0.1.0", "ok"))
+        toml = (SRC / "litesuite_rust_sidecar" / "litesound" / "envs.toml").read_bytes()
+        self.assertEqual(body["recipe_sha256"], hashlib.sha256(toml).hexdigest())
+
     def test_yue_and_unknown_environments_are_refused(self):
         with self.assertRaises(SystemExit) as yue:
             envsetup.commands("yue", "UV", "PY")

@@ -12,10 +12,12 @@ environment only if verify passed, so a failed or cancelled build counts as not 
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
 import tomllib
+from datetime import datetime, timezone
 from importlib import metadata
 from pathlib import Path
 
@@ -86,6 +88,17 @@ def verify(env: str, python: str, app: str = "litesound") -> tuple[bool, str]:
     return True, detail
 
 
+def recipes_sha256(app: str = "litesound") -> str:
+    """The SHA-256 of the app's envs.toml as shipped: the app compares it with the one it was
+    built against and reports an environment built from other recipes as needing an update."""
+    return hashlib.sha256((PACKAGE / app / "envs.toml").read_bytes()).hexdigest()
+
+
+def marker_body(env: str, version: str, app: str, detail: str) -> dict:
+    """`litesound-env.json` (C2): written last, only after verify passed."""
+    return {"env": env, "package_version": version, "recipe_sha256": recipes_sha256(app), "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"), "verify": "ok", "gpu": detail}
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="python -m litesuite_rust_sidecar.envsetup")
     parser.add_argument("env")
@@ -114,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
         version = metadata.version("litesuite-rust-sidecar")
     except metadata.PackageNotFoundError:
         version = "unknown"
-    marker.write_text(json.dumps({"app": args.app, "env": args.env, "package_version": version, "torch_index": recipe(args.env, args.app).get("torch_index", ""), "verified": detail}, indent=2), encoding="utf-8")
+    marker.write_text(json.dumps(marker_body(args.env, version, args.app, detail), indent=2), encoding="utf-8")
     return 0
 
 
