@@ -30,5 +30,4 @@ They load no model and need no torch.
   the engine falls back to folders counted upwards from its own file. The Rust app always sets
   these variables.
 - Not here yet: the launch token (`auth.py`), `envsetup.py` and `envs.toml`.
-- The licence of the package is not stated in `pyproject.toml` yet. The vendored VibeVoice tree
-  keeps its own licence and `PROVENANCE.md`.
+- MIT (`LICENSE`). The vendored VibeVoice tree keeps its own licence and `PROVENANCE.md`.

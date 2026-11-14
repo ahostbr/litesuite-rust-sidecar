@@ -9,6 +9,10 @@ description = "The Python engines the Rust Lite apps start beside themselves. Th
 readme = "README.md"
 # The engine runs on CPython 3.11 today (python/.venv is 3.11.9).
 requires-python = ">=3.11,<3.12"
+# MIT (Ryan). An SPDX expression (PEP 639, setuptools >= 77); with it, setuptools refuses the
+# old "License ::" classifier, so none is given.
+license = "MIT"
+license-files = ["LICENSE"]
 # No required dependencies: each app has an extra, and torch and the model libraries are
 # installed per environment by ordered steps, not as dependencies (sub-w6-sidecar.md, C1 and C3).
 dependencies = []
