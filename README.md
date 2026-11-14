@@ -29,5 +29,7 @@ They load no model and need no torch.
 - When `LITESOUND_MODELS_DIR`, `LITESOUND_LOG_DIR` and the runtime folder variables are not set,
   the engine falls back to folders counted upwards from its own file. The Rust app always sets
   these variables.
-- Not here yet: the launch token (`auth.py`), `envsetup.py` and `envs.toml`.
+- The launch token (`auth.py`): with `LITESUITE_SIDECAR_TOKEN` set, every request but `/health` needs
+  the header `X-LiteSuite-Sidecar-Token`; unset, the engine is open as before.
+- Not here yet: `envsetup.py` and `envs.toml`.
 - MIT (`LICENSE`). The vendored VibeVoice tree keeps its own licence and `PROVENANCE.md`.

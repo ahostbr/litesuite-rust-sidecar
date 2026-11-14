@@ -35,9 +35,13 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 import uvicorn
 
+from ..auth import SidecarToken
+
 PORT = int(os.environ.get("LITESOUND_PORT", 7428))
 
 app = FastAPI(title="LiteSound Audio Engine", version="1.0.0")
+# C4: with LITESUITE_SIDECAR_TOKEN set, only the app that started this engine can drive it.
+app.add_middleware(SidecarToken)
 
 # Global: one backend loaded at a time
 _active_backend = None
