@@ -38,4 +38,4 @@ litesound = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-"litesuite_rust_sidecar.litesound" = ["vendor/**/*"]
+"litesuite_rust_sidecar.litesound" = ["vendor/**/*", "envs.toml"]

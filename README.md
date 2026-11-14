@@ -31,5 +31,8 @@ They load no model and need no torch.
   these variables.
 - The launch token (`auth.py`): with `LITESUITE_SIDECAR_TOKEN` set, every request but `/health` needs
   the header `X-LiteSuite-Sidecar-Token`; unset, the engine is open as before.
-- Not here yet: `envsetup.py` and `envs.toml`.
+- Environments: `litesound/envs.toml` holds the ordered `uv pip` steps of each engine environment,
+  and `python -m litesuite_rust_sidecar.envsetup <env> --uv <uv.exe> [--dry-run]` runs them, checks
+  the GPU and the imports, and writes `litesound-env.json` only when that passes. `yue` is not
+  installable from the package yet (no recorded recipe).
 - MIT (`LICENSE`). The vendored VibeVoice tree keeps its own licence and `PROVENANCE.md`.
