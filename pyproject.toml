@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "litesuite-rust-sidecar"
-version = "0.1.0"
+version = "0.1.1"
 description = "The Python engines the Rust Lite apps start beside themselves. This version holds LiteSound's audio engine."
 readme = "README.md"
 # The engine runs on CPython 3.11 today (python/.venv is 3.11.9).

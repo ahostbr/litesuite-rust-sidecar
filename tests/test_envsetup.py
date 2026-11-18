@@ -66,8 +66,27 @@ class EnvSetupTest(unittest.TestCase):
     def test_main_is_the_checkout_setup_torch_first_then_the_requirements(self):
         steps = envsetup.commands("main", "UV", "PY")
         self.assertEqual(steps[0], as_uv(["install", "--pre", "torch", "torchaudio", "--index-url", NIGHTLY]))
-        self.assertIn("audiocraft>=1.3.0", steps[1])
         self.assertIn("uvicorn[standard]>=0.34.0", steps[1])
+
+    def test_main_has_musicgens_and_barks_packages_but_not_audiocraft(self):
+        # audiocraft>=1.3.0 depends on torchaudio<2.1.2, which cannot resolve with torchaudio>=2.6.0
+        # (uv: "No solution found when resolving dependencies"). MusicGen loads through transformers
+        # and Bark through suno-bark; nothing imports audiocraft (the next test).
+        args = [a for step in envsetup.commands("main", "UV", "PY") for a in step]
+        self.assertFalse([a for a in args if "audiocraft" in a])
+        for needed in ("transformers>=4.49.0", "suno-bark>=0.0.1", "torchaudio>=2.6.0", "torchsde>=0.2.6"):
+            self.assertIn(needed, args)
+
+    def test_nothing_in_the_package_imports_audiocraft(self):
+        import re
+        uses = []
+        for path in (SRC / "litesuite_rust_sidecar").rglob("*.py"):
+            for n, line in enumerate(path.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+                if re.match(r"\s*(import|from)\s+audiocraft\b", line):
+                    uses.append(f"{path.name}:{n}")
+        self.assertEqual(uses, [], "something imports audiocraft: main's recipe must install it again")
+        mg = (SRC / "litesuite_rust_sidecar" / "litesound" / "backends" / "musicgen.py").read_text(encoding="utf-8")
+        self.assertIn("MusicgenForConditionalGeneration", mg, "positive control: the scan reads the MusicGen backend")
 
     def test_the_torch_index_is_data(self):
         for env, found in envsetup.recipes().items():
